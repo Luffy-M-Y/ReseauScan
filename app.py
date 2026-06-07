@@ -1,5 +1,5 @@
-import subprocess # lance app.py
-
+import subprocess
+from waitress import serve
 from flask import Flask, jsonify, send_from_directory
 app = Flask(__name__)
 
@@ -70,4 +70,5 @@ def scanner():
  
    
 if __name__ == '__main__':
-    app.run(debug=True)
+    # waitress = serveur WSGI Windows, un seul processus, pas de reloader
+    serve(app, host='127.0.0.1', port=5000)

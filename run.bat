@@ -1,2 +1,2 @@
 @echo off
-start /B pythonw app.py
+start /B pythonw tray.py

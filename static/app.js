@@ -1,9 +1,24 @@
 // On récupère les éléments HTML qu'on va manipuler.
-// getElementById retourne l'élément dont l'id correspond.
 const btn    = document.getElementById('btn-scan');
 const panel  = document.getElementById('result-panel');
 const errMsg = document.getElementById('error-msg');
 const signal = document.getElementById('signal');
+
+// ── Logique des onglets ──
+// querySelectorAll retourne TOUS les éléments avec la classe .tab (un tableau).
+// On boucle dessus avec forEach pour ajouter un écouteur de clic sur chacun.
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    // Retire .tab-active de tous les onglets
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('tab-active'));
+    // Cache tous les panels
+    document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
+    // Active l'onglet cliqué
+    tab.classList.add('tab-active');
+    // Affiche le panel correspondant — data-target dans le HTML indique quel id afficher
+    document.getElementById(tab.dataset.target).style.display = 'block';
+  });
+});
 
 // addEventListener('click', ...) : on "écoute" le clic sur le bouton.
 // async () => {} : fonction asynchrone — elle peut utiliser await à l'intérieur.

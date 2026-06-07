@@ -14,8 +14,11 @@ def lancer_flask():
     )
 
 def quitter_icone(icon, item):
+    global flask_process
     if flask_process:
-        flask_process.terminate()  # ← tue Flask
+        # /F = force, /T = tue tout l'arbre de processus enfants
+        # plus fiable que psutil sur Windows avec pythonw
+        subprocess.call(['taskkill', '/F', '/T', '/PID', str(flask_process.pid)])
     icon.stop()  # arrête l'icône et le programme
     
 def creer_icone():
@@ -25,10 +28,7 @@ def creer_icone():
     return image
 
 def ouvrir_navigateur():
-    webbrowser.open('http://127.0.0.1:5000/')   # ouvre le navigateur sur l'adresse localhost
-
-def quitter_icone(icon, item):
-    icon.stop()  # arrête l'icône et le programme   
+    webbrowser.open('http://127.0.0.1:5000/')   # ouvre le navigateur sur l'adresse localhost 
     
 if __name__ == '__main__':
     # Lance Flask dans un thread séparé
