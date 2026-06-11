@@ -20,7 +20,7 @@ def get_ssid():
         ['netsh', 'wlan', 'show', 'interfaces'],
         capture_output=True,
         text=True,
-        encoding="cp850",
+        encoding="utf-8",
         creationflags=subprocess.CREATE_NO_WINDOW
     )
     
@@ -41,7 +41,7 @@ def get_password(ssid):
         ['netsh', 'wlan', 'show', 'profile', f'name={ssid}' ,'key=clear'],
         capture_output=True,
         text=True,
-        encoding="cp850",
+        encoding="utf-8",
         creationflags=subprocess.CREATE_NO_WINDOW
     )
     print("=== SORTIE NETSH ===")
@@ -64,7 +64,7 @@ def get_security():
         ['netsh', 'wlan', 'show', 'interfaces'],
         capture_output=True,
         text=True,
-        encoding="cp850",
+        encoding="utf-8",
         creationflags=subprocess.CREATE_NO_WINDOW
     )
     
@@ -188,7 +188,7 @@ def recup_values():
     
     # Étape 3 : Valide que les deux nouveaux mdp correspondent
     if new_Password != confirm_Password:
-        return jsonify({"error": "Les nouveaux mots de passe ne correspondent pas"})
+        return jsonify({"error": "Les nouveaux mots de passe ne correspondent pas."})
  
     # Étape 4 : Vérifie type de compte (sécurité requise ou non)
     if check_passord_required(username) == False:
@@ -203,6 +203,7 @@ def recup_values():
             result = subprocess.run(
                 f'net user "{username}" "{new_Password}"',
                 capture_output=True,
+                encoding="utf-8",
                 text=True,
                 shell=True
             )

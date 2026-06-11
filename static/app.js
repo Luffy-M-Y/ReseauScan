@@ -193,7 +193,7 @@ changeBtn.addEventListener('click', async () => {
     // ── Étape 4 : traite réponse ──
  
     // Vérification spéciale : compte Microsoft (redirection Settings)
-    if (data.error == "Compte Microsoft détecté. Redirection vers les paramètres de connexion manuels...") {
+    if (data.error == 'Compte Microsoft détecté. Redirection vers Windows Settings...') {
       // CAS 1 : compte Microsoft détecté
       // Windows Settings s'ouvre automatiquement côté serveur
       // Message à l'utilisateur : l'erreur reçue
@@ -209,19 +209,44 @@ changeBtn.addEventListener('click', async () => {
       // Désactive bouton (champs maintenant vides)
       verifierChamps();
  
-    } else {
-      // CAS 2 : changement réussi (pas d'erreur, donc success implicite)
-      passMsg.textContent    = 'Password changed successfully!';
-      passMsg.className      = 'success';  // couleur verte CSS
-      passMsg.style.display  = 'block';
+    } 
+    else if (data.error == 'Mot de passe actuel incorrect') {
+      // CAS 2 : mot de passe actuel incorrect
+      passMsg.textContent   = '⚠ ' + data.error;
+      passMsg.className     = 'error';  // couleur rouge CSS
+      passMsg.style.display = 'block';
       
-      // Vide les champs après succès
+      // Vide uniquement le champ du mot de passe actuel
+      document.getElementById('old-pass').value = '';
+      
+      // Désactive bouton (champ old-password maintenant vide)
+      verifierChamps();
+      
+    }
+    else if (data.error == 'Les nouveaux mots de passe ne correspondent pas.'){
+      // CAS 3 : nouveau mot de passe et confirmation ne correspondent pas
+      passMsg.textContent   = '⚠ ' + data.error;
+      passMsg.className     = 'error';  // couleur rouge CSS
+      passMsg.style.display = 'block';
+    }
+    else{
+      // CAS 4 : succès
+      passMsg.textContent   = '✓ Mot de passe changé avec succès !';
+      passMsg.className     = 'success';  // couleur verte CSS
+      passMsg.style.display = 'block';
+
+      // Vide les champs
       document.getElementById('old-pass').value = '';
       document.getElementById('new-pass').value = '';
       document.getElementById('confirm-pass').value = '';
+
+      // Désactive bouton (champs maintenant vides)
+      verifierChamps();
+
+      // Affiche panel password
+      panel.style.display = 'block';
     }
- 
-  } catch (e) {
+} catch (e) {
     // CAS 3 : erreur réseau (Flask pas lancé, etc)
     passMsg.textContent   = '⚠ Impossible de contacter le serveur.';
     passMsg.style.display = 'block';
