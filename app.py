@@ -20,7 +20,7 @@ def get_ssid():
         ['netsh', 'wlan', 'show', 'interfaces'],
         capture_output=True,
         text=True,
-        encoding="utf-8",
+        encoding="cp65001",
         creationflags=subprocess.CREATE_NO_WINDOW
     )
     
@@ -41,7 +41,7 @@ def get_password(ssid):
         ['netsh', 'wlan', 'show', 'profile', f'name={ssid}' ,'key=clear'],
         capture_output=True,
         text=True,
-        encoding="utf-8",
+        encoding="cp65001",
         creationflags=subprocess.CREATE_NO_WINDOW
     )
     print("=== SORTIE NETSH ===")
@@ -50,7 +50,21 @@ def get_password(ssid):
     
     #Recuperation de la ligne contenant le mot de passe
     for line in result.stdout.splitlines():
-        if "Key Content" in line or "Contenu de la cl" in line:
+        if ("Key Content" in line or           # Anglais
+            "Contenu de la cl" in line or      # Français
+            "Contenido de la clave" in line or # Espagnol
+            "Schlüsselinhalt" in line or       # Allemand
+            "Contenuto chiave" in line or      # Italien
+            "Conteúdo da chave" in line or     # Portugais
+            "Содержимое ключа" in line or      # Russe
+            "Ključni sadržaj" in line or       # Croate
+            "Inhoud van sleutel" in line or    # Néerlandais
+            "Nyckel innehåll" in line or       # Suédois
+            "Treści klucza" in line or         # Polonais
+            "Obsah klíče" in line or           # Tchèque
+            "キーコンテンツ" in line or         # Japonais
+            "密钥内容" in line or               # Chinois simplifié
+            "金鑰內容" in line):                # Chinois traditionnel:
             print("cle trouvée")
             password = line.split(":",1 )[1].strip()
             return password
@@ -64,12 +78,26 @@ def get_security():
         ['netsh', 'wlan', 'show', 'interfaces'],
         capture_output=True,
         text=True,
-        encoding="utf-8",
+        encoding="cp65001",
         creationflags=subprocess.CREATE_NO_WINDOW
     )
     
     for line in result.stdout.splitlines():
-        if "Authentification" in line:
+        if ("Authentification" in line or           # Français
+            "Authentication" in line or             # Anglais
+            "Autenticación" in line or              # Espagnol
+            "Authentifizierung" in line or          # Allemand
+            "Autenticazione" in line or             # Italien
+            "Autenticação" in line or               # Portugais
+            "Аутентификация" in line or             # Russe
+            "Autentifikacija" in line or            # Croate
+            "Authenticatie" in line or              # Néerlandais
+            "Autentisering" in line or              # Suédois
+            "Uwierzytelnianie" in line or           # Polonais
+            "Ověření" in line or                    # Tchèque
+            "認証" in line or                        # Japonais
+            "身份验证" in line or                    # Chinois simplifié
+            "驗證" in line):                         # Chinois traditionnel
             security = line.split(":",1)[1].strip()
             return security 
  
@@ -112,21 +140,23 @@ def scanner():
 #   - Si "Oui" → retourne True (exigé, besoin de redirection Settings)
 def check_passord_required(username):
     password_exig = subprocess.run(
-        f'net user "{username}"',
+        ['powershell', '-Command', f'Get-LocalUser -Name "{username}" | Select-Object PasswordRequired'],
         capture_output=True,
         text=True,
         encoding="cp850",
         creationflags=subprocess.CREATE_NO_WINDOW
     )
+    print("=== SORTIE CHECK PASSWORD REQUIRED ===")
+    print(password_exig.stdout)
+    if password_exig.returncode == 0:
+        if "False" in password_exig.stdout:
+            print("Mot de passe non exigé")
+            return False
+        else:
+            print("Mot de passe exigé")
+            return True
  
-    for ligne in password_exig.stdout.splitlines():
-        if "exigé" in ligne or "Mot de passe exigé" in ligne:
-            if "Non" in ligne or "non" in ligne:
-                print("Sortie trouvé")
-                print(ligne)
-                return False
-            else:
-                return True
+    
  
 # ════════════════════════════════════════
 # SECTION 4 : VÉRIFICATION MOT DE PASSE
@@ -172,7 +202,7 @@ def recup_values():
     # Lit user.txt (créé par run.bat AVANT élévation admin)
     # Fallback : os.getenv('USERNAME') si fichier absent
     try:
-        with open('user.txt', 'r') as f:
+        with open(os.path.join(os.getenv('APPDATA'), 'user.txt'), 'r') as f:
             username = f.read().strip()
     except:
         username = os.getenv('USERNAME')
