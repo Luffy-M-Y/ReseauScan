@@ -1,5 +1,8 @@
-*.SUPER_NOVA.iss
-*.SUPER_NOVA.iss.7z
-*.SUPER_NOVA.iss.zip
-*.SUPER_NOVA.spec
-*.User.txt
+build/
+dist/
+user.txt
+*.exe
+SUPER_NOVA.spec
+Lunch.vbs
+run.bat
+SUPER_NOVA.iss
